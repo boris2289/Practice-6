@@ -32,8 +32,17 @@ services:
     environment:
       API_BASE_URL: http://api:8000
       TEST_CSV_PATH: /app/data/fashion_test.csv
+      POSTGRES_HOST: host.docker.internal
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      DEFAULT_SEED_LIMIT: 100
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./data:/app/data
+      - ./artifacts:/app/artifacts
     depends_on:
       - api
 
@@ -54,3 +63,27 @@ services:
       - ./artifacts:/app/artifacts
     depends_on:
       - mlflow
+
+  batch_scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: fashion-batch-scheduler
+    profiles:
+      - batch
+    command: ["python", "-m", "app.batch.scheduler"]
+    environment:
+      POSTGRES_HOST: host.docker.internal
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      BATCH_INTERVAL_SECONDS: 300
+      BATCH_LIMIT: 100
+      BATCH_MODEL_VERSION: scheduled-rf-v1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./artifacts:/app/artifacts
+    depends_on:
+      - api

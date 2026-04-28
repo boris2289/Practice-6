@@ -4,8 +4,8 @@ import pandas as pd
 
 from app.core.paths import DATA_DIR, TEST_CSV_PATH, TRAIN_CSV_PATH
 
-TRAIN_URL = "https://raw.githubusercontent.com/ymattu/fashion-mnist-csv/refs/heads/master/fashion_train.csv"
-TEST_URL = "https://raw.githubusercontent.com/ymattu/fashion-mnist-csv/refs/heads/master/fashion_test.csv"
+TRAIN_URL = "https://raw.githubusercontent.com/ymattu/fashion-mnist-csv/master/fashion_train.csv"
+TEST_URL = "https://raw.githubusercontent.com/ymattu/fashion-mnist-csv/master/fashion_test.csv"
 
 
 def ensure_data_dir() -> None:
@@ -27,14 +27,13 @@ def load_datasets() -> tuple[pd.DataFrame, pd.DataFrame]:
     return train_df, test_df
 
 
-def prepare_features(train_df, test_df):
-
-    target_col = "label"
-
-    x_train = train_df.drop(columns=[target_col]).astype("float32") / 255.0
-    y_train = train_df[target_col].astype("int64")
-
-    x_test = test_df.drop(columns=[target_col]).astype("float32") / 255.0
-    y_test = test_df[target_col].astype("int64")
-
+def prepare_features(
+    train_df: pd.DataFrame,
+    test_df: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series]:
+    target_col = 'label' if 'label' in train_df.columns else 'y'
+    x_train = train_df.drop(columns=[target_col]).astype('float32') / 255.0
+    y_train = train_df[target_col].astype('int64')
+    x_test = test_df.drop(columns=[target_col]).astype('float32') / 255.0
+    y_test = test_df[target_col].astype('int64')
     return x_train, y_train, x_test, y_test

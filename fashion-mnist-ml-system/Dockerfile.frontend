@@ -10,6 +10,9 @@ RUN pip install --no-cache-dir -r /tmp/requirements-frontend.txt
 
 COPY app ./app
 COPY data ./data
+COPY artifacts ./artifacts
+
+ENV PYTHONPATH=/app
 
 EXPOSE 8501
 
